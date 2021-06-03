@@ -4,7 +4,6 @@ const newToyForm = document.querySelector('.add-toy-form')
 const inputText = document.querySelectorAll('input')
 
 
-
 document.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.querySelector("#new-toy-btn");
   const toyFormContainer = document.querySelector(".container");
@@ -18,40 +17,61 @@ document.addEventListener("DOMContentLoaded", () => {
       toyFormContainer.style.display = "none";
     }
   });
-  const likeBtn = toyCollection.getElementsByClassName('like-btn')
-    
-  // console.log(likeBtn)
-
-function likedAmount(likes) {
-  likeBtn.forEach(like => console.log(like))
-}
-//   likeBtn.addEventListener('click', (e) => {
-//     e.forEach((id) => { 
-//       console.log(id)
-//     }) 
-likedAmount()
-});
-
-  
+ 
+})
   
 
+
+ function renderCards () {
   fetch("http://localhost:3000/toys")
-  .then(res => res.json())
-  .then((toy) => {
-    toy.forEach((card) => {
-      createCard(card)
-    })
+    .then(res => res.json())
+    .then((toy) => {
+      toy.forEach((card) => {
+        createCard(card)
+      })      
   })
+ }
 
-
+ renderCards()
+  
 function createCard(card) {
   const newCard = document.createElement("div")
+  const hTag = document.createElement('h2')
+  let pTag = document.createElement('p')
+  const btnTag = document.createElement('button')
+  const imgTag = document.createElement('img')
+  btnTag.classList.add('like-btn')
+  imgTag.classList.add('toy-avatar')
   newCard.classList.add('card')
-  newCard.innerHTML = `<h2>${card.name}</h2>
-   <img class = "toy-avatar" src=${card.image}></img>
-   <p>${card.likes}</p>
-   <button class= "like-btn" id= "${card.id}">like</button>`
-   toyCollection.appendChild(newCard)
+  btnTag.id = card.id
+  imgTag.src = card.image
+  pTag.innerText = card.likes
+  btnTag.innerText = 'like'
+  hTag.innerText = card.name
+  const toyId = card.id
+  let toyLikes = card.likes
+  // console.log(toyLikes)
+  btnTag.addEventListener('click', (e) => {
+    fetch(`http://localhost:3000/toys/${e.target.id}`, {
+      
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        "likes": ++toyLikes
+      })
+      
+    })
+    .then(res => res.json())
+    .then((like) => {
+      pTag.innerText = toyLikes
+    })
+  })
+  newCard.append(hTag, imgTag, pTag, btnTag)
+  toyCollection.appendChild(newCard)
+
 }
 
 
@@ -70,35 +90,12 @@ const addNewToy = newToyForm.addEventListener('submit', (e) => {
       "likes": 0
     })
   })
-  .then(function(res) {
-    return res.json();
-})
+  .then(res => res.json())
   .then(function(object) {
     createCard(object)
 })
 })
-
-
-
-  // fetch(`http://localhost:3000/toys/${button.id}`) 
   
-    // method: "PATCH",
-    // headers: {
-    //   "Content-Type": "application/json",
-    //   "Accept": "application/json"
-    // },
-    // body: JSON.stringify({
-    //   "id": e.target.value
-    // })
+  
 
-//   .then(function(object) {
-//     createCard(object)
-// })
-// })
-
-// fetch("http://localhost:3000/toys/10 ", {
-//   method: 'DELETE',
-// })
-// .then(res => res.json())
-// .then(console.log)
 
